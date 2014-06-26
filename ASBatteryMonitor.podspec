@@ -7,5 +7,6 @@ Pod::Spec.new do |spec|
   spec.summary      = "Seamlessly update your app based on the user's battery state."
   spec.source       = { :git => 'https://github.com/AmbientStatus/ASBatteryMonitor.git', :tag => spec.version.to_s }
   spec.source_files = 'Classes/'
+  spec.frameworks   = 'UIKit', 'Foundation'
   spec.requires_arc = true
 end
