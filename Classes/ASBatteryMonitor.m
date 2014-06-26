@@ -22,7 +22,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "AmbientStatus.h"
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+
 #import "ASBatteryMonitor.h"
 
 @interface ASBatteryMonitor ()
@@ -47,35 +49,35 @@
     dispatch_once(&onceToken, ^{
         instance = [self new];
     });
-    
+
     return instance;
 }
 
 - (void)startMonitoring {
     [UIDevice currentDevice].batteryMonitoringEnabled = YES;
-    
+
     NSNotificationCenter *notificationCenter = [NSNotificationCenter defaultCenter];
-    
+
     [notificationCenter addObserver:self
                            selector:@selector(batteryLevelDidChange:)
                                name:UIDeviceBatteryLevelDidChangeNotification object:nil];
-    
+
     [notificationCenter addObserver:self
                            selector:@selector(batteryStateDidChange:)
                                name:UIDeviceBatteryStateDidChangeNotification object:nil];
-    
+
     _monitoring = YES;
-    
+
     [self batteryStateDidChange:nil];
 }
 
 - (void)stopMonitoring {
     [UIDevice currentDevice].batteryMonitoringEnabled = NO;
-    
+
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
+
     _monitoring = NO;
-    
+
     [self batteryStateDidChange:nil];
 }
 
@@ -99,7 +101,7 @@
 
 - (void)updateBatteryLevel {
     _percentage = [UIDevice currentDevice].batteryLevel;
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         if (_delegate && [_delegate respondsToSelector:@selector(batteryMonitor:didChangeBatteryLevel:)]) {
             [_delegate batteryMonitor:self didChangeBatteryLevel:_percentage];
@@ -109,11 +111,11 @@
 
 - (void)updateBatteryState {
     UIDeviceBatteryState currentState = [UIDevice currentDevice].batteryState;
-    
+
     [self resetBatteryStates];
-    
+
     _state = currentState;
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         if (_delegate && [_delegate respondsToSelector:@selector(batteryMonitor:didChangeBatteryState:)]) {
             [_delegate batteryMonitor:self didChangeBatteryState:_state];
@@ -127,15 +129,15 @@
         case UIDeviceBatteryStateFull:
             _full = YES;
             break;
-            
+
         case UIDeviceBatteryStateCharging:
             _charging = YES;
             break;
-            
+
         case UIDeviceBatteryStateUnplugged:
             _unplugged = YES;
             break;
-            
+
         default:
             _unknown = YES;
             break;
@@ -147,7 +149,7 @@
     _charging = NO;
     _unplugged = NO;
     _unknown = YES;
-    
+
     _state = UIDeviceBatteryStateUnknown;
 }
 
